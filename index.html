@@ -56,60 +56,45 @@ function validatePrompt(control, promptStr) {
     <p id="risk">Historical investment risk : </p>
     <p id="decision">Decision : </p>
 
+    <button align=center class="btn">Make a strategic decision</button>
+    <ul class="info"></ul>
+
 </form>
 
-<script>
-function light(sw) {
-   var pic;
-
-   pic = "report/AAPLGOOGreport.json"
-
-  document.getElementById('acc').innerHTML = pic;
-}
-</script>
 
 
 <object align=center  data="report/AAPLGOOGreport.json"></object>
 
 
-<script type="application/json" src="report/AAPLGOOGreport.json">
-    var re = report.Decision;
-    document.write(re)
-    document.getElementById("acc").innerHTML = re;
-</script>
 
-<p id="acc">Historical Testing Accuracy : </p>
-
-<script id="data" type="application/json"><?php include('report/AAPLGOOGreport.json'); ?></script>
 <script>
-var jsonData = JSON.parse(document.getElementById('data').textContent)
+    var xhr = new XMLHttpRequest();
+		xhr.open('get','https://raw.githubusercontent.com/Quant-NLP/OPTrading/main/report/AAPLGOOGreport.json',true);
+		xhr.send(null);
+		xhr.onload = function(){
+			var datastr = JSON.parse(xhr.responseText);
+			var info = document.querySelector('.info');
+			var len  = datastr.length;
+			var str= "";
+			var btn = document.querySelector('.btn');
+			btn.onclick = function(e){
+			var content = '<p>'+'<li> Historical Testing Accuracy : ' +datastr[0].acc + '%' +'</li>'+'</p>'
+			+'<p>'+'<li> Historical return on investment : '+datastr[0].return + '%' +'</li>'+'</p>'
+			+'<p>'+'<li> Historical investment risk : '+datastr[0].risk + '%'+'</li>' +'</p>'
+			+'<p>'+'<li> Decision : '+datastr[0].decision+'</li>'+'</p>';
+
+        console.log(content);
+			str+=content;
+			info.innerHTML += str;
+			return;
+			};
+
+		};
+
 </script>
 
-<p id="data">Historical Testing Accuracy : </p>
 
 
-<p>
-<button type="button" onclick="light(1)">Light On</button>
-</p>
-
-<p>Take a look at <a href="report/AAPLGOOGreport.json" target="_blank">report</a></p>
-
-<button class="btn">遊樂園資訊</button>
-<ul class="info">
-</ul>
-
-xhr.open('get','https://ruienyuski.github.io/git_test/data.json',true);
-xhr.send(null);
-xhr.onload = function(){
-};
-
-var datastr = JSON.parse(xhr.responseText);
-
-
-var btn = document.querySelector('.btn');
-btn.onclick = function(e){
-for (var i = 0; i < len; i++) {...}
-}
 
 </body>
 </html>
