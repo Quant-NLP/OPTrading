@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>OPTrading</title>
@@ -57,7 +58,58 @@ function validatePrompt(control, promptStr) {
 
 </form>
 
+<script>
+function light(sw) {
+   var pic;
 
+   pic = "report/AAPLGOOGreport.json"
+
+  document.getElementById('acc').innerHTML = pic;
+}
+</script>
+
+
+<object align=center  data="report/AAPLGOOGreport.json"></object>
+
+
+<script type="application/json" src="report/AAPLGOOGreport.json">
+    var re = report.Decision;
+    document.write(re)
+    document.getElementById("acc").innerHTML = re;
+</script>
+
+<p id="acc">Historical Testing Accuracy : </p>
+
+<script id="data" type="application/json"><?php include('report/AAPLGOOGreport.json'); ?></script>
+<script>
+var jsonData = JSON.parse(document.getElementById('data').textContent)
+</script>
+
+<p id="data">Historical Testing Accuracy : </p>
+
+
+<p>
+<button type="button" onclick="light(1)">Light On</button>
+</p>
+
+<p>Take a look at <a href="report/AAPLGOOGreport.json" target="_blank">report</a></p>
+
+<button class="btn">遊樂園資訊</button>
+<ul class="info">
+</ul>
+
+xhr.open('get','https://ruienyuski.github.io/git_test/data.json',true);
+xhr.send(null);
+xhr.onload = function(){
+};
+
+var datastr = JSON.parse(xhr.responseText);
+
+
+var btn = document.querySelector('.btn');
+btn.onclick = function(e){
+for (var i = 0; i < len; i++) {...}
+}
 
 </body>
 </html>
