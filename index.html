@@ -1,0 +1,63 @@
+<html>
+<head>
+    <title>OPTrading</title>
+</head>
+
+<body>
+<h1 align=center>OPTrading : A Framework for Opinion-based Pairs Trading</h1>
+<hr>
+
+
+<h3 align=center>We provide ten stocks (AAPL, GOOG, GE, MMM, JPM, C, BAC, WMT, MCD, ABBV) to be paired.</h3>
+
+<script>
+
+function readTextFile(file, callback) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function() {
+        if (rawFile.readyState === 4 && rawFile.status == "200") {
+            callback(rawFile.responseText);
+        }
+    }
+    rawFile.send(null);
+}
+
+
+
+function report(form) {
+
+    document.getElementById("acc").innerHTML = 'Historical Testing Accuracy : '  + '60.78 %';
+    document.getElementById("return").innerHTML = 'Historical return on investment : '  + '107.89 %';
+    document.getElementById("risk").innerHTML = 'Historical investment risk : '  + '1.48 %';
+    document.getElementById("decision").innerHTML = 'Decision : ' + 'Long AAPL Short GOOG' ;
+
+    return;
+	document.testform.submit();	// Submit form
+}
+
+function validatePrompt(control, promptStr) {
+	alert(promptStr);
+	control.focus();
+	return;
+}
+</script>
+
+<form name=testform align=center>
+<P>Stock 1 <input type="text" name="stock1" value="AAPL">
+<P>Stock 2 <input type="text" name="stock2" value="GOOG">
+
+<P><input type="button" value="submit" onClick="report(this.form)">
+
+    <p id="acc">Historical Testing Accuracy : </p>
+    <p id="return">Historical return on investment : </p>
+    <p id="risk">Historical investment risk : </p>
+    <p id="decision">Decision : </p>
+
+</form>
+
+
+
+</body>
+</html>
