@@ -187,7 +187,7 @@ def report_acc(df_test, clf):
     
     pred_test = clf.predict(X_test)
     
-    print('\nHistorical Testing Accuracy : ', accuracy_score(y_test, pred_test) *100 , '%')
+    print('\nHistorical Testing Accuracy : ', round(accuracy_score(y_test, pred_test) *100, 2) , '%')
     
 report_acc(df_test, clf)
 
@@ -211,8 +211,8 @@ def compute_profit_risk(df, X_):
     for i in range(len(df)):
         final_return = final_return + df['profit'].iloc[i] * final_return
     
-    print('Historical return on investment : ', final_return / total_return * 100, '%')
-    print('Historical investment risk : ', df['profit'].std() *100 , '%\n')
+    print('Historical return on investment : ', round(final_return / total_return * 100, 2), '%')
+    print('Historical investment risk : ', round(df['profit'].std() *100, 2) , '%\n')
     
 compute_profit_risk(df_test, X_test)
 
