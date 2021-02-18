@@ -12,6 +12,7 @@ $ pip install -r requirements.txt
 
 We require [pystocktwits](https://github.com/khmurakami/pystocktwits) for crawling data from [Stocktwits](https://stocktwits.com/).
 
+In our experiment, we use the partial [StockNet](https://github.com/yumoxu/stocknet-dataset) data, which is collected from Twitter.
 
 ## Getting Started
 
