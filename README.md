@@ -27,7 +27,7 @@ bash scripts/run.sh stock1 stock2
 crawling AAPL tweets ...
 crawling GOOG tweets ...
 
-Historical Testing Accuracy :  0.6078431372549019
+Historical Testing Accuracy :  60.78431372549019 %
 Historical return on investment :  107.89564439891353 %
 Historical investment risk :  1.4847406578104394 %
 
