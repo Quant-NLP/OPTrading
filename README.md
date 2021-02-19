@@ -31,7 +31,7 @@ crawling AAPL tweets ...
 crawling GOOG tweets ...
 
 Historical Testing Accuracy :  60.78 %
-Historical return on investment :  107.9 %
+Historical return on investment :  7.9 %
 Historical investment risk :  1.48 %
 
 Decision :
