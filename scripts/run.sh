@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python inference.py $1 $2
+python pairs.py $1 $2

@@ -31,6 +31,10 @@ window_days = 1
 
 seed_val = 2021
 
+tech = ['GOOG', 'MSFT', 'FB', 'T', 'CHL', 'ORCL', 'TSM', 'VZ', 'INTC', 'CSCO']
+fin = ['BCH', 'BSAC', 'BRK-A', 'JPM', 'WFC', 'BAC', 'V', 'C', 'HSBC', 'MA']
+all_stocks = tech + fin
+
 stock1 = sys.argv[1]
 stock2 = sys.argv[2]
 
@@ -125,7 +129,9 @@ def get_df(stockname):
     df = df[['Date', 'Strength', 'sentence_embedding']]
     
     return df
-            
+ 
+result = pd.DataFrame()
+    
 df_stock1 = get_df(stock1)
 df_stock2 = get_df(stock2)
 
@@ -137,7 +143,8 @@ len_df = len(df)
 df_train = df[:int(len_df * 0.8)]
 df_dev = df[int(len_df * 0.8):int(len_df * 0.9)]
 df_test = df[int(len_df * 0.9):]
-    
+
+
 def get_stocktwit(stock):
     raw_json = twit.get_symbol_msgs(symbol_id=stock, since=0, max=0, limit=30, callback=None, filter=None)
     #return_json_file(raw_json, 'result.json')
@@ -151,11 +158,12 @@ def get_sentence_embedding(df):
     sentences = []
 
     for i in range(len(df)):
+        #print(df[i]['body'])
         sentences.append(df[i]['body'])
-        
+
     sentence_embeddings = model.encode(sentences)
     sentence_embedding = sentence_embeddings.mean(axis=0)
-    
+
     return sentence_embedding
 
 print('crawling', stock1, 'tweets ...')
@@ -166,9 +174,8 @@ sentence_embedding2 = get_sentence_embedding(df_stock2)
 
 sentence_embedding = np.append(sentence_embedding1, sentence_embedding2)
 
-
 def preprocess(df):
-    
+
     data = pd.DataFrame()
     data = pd.concat([pd.DataFrame(df['sentence_embedding_x'].tolist()), pd.DataFrame(df['sentence_embedding_y'].tolist())], axis = 1)
     data = data.T.reset_index(drop=True)
@@ -184,12 +191,16 @@ clf = Perceptron(tol=1e-3, random_state=seed_val)
 clf.fit(X_train, y_train)
 
 def report_acc(df_test, clf):
-    
+
     pred_test = clf.predict(X_test)
-    
-    print('\nHistorical Testing Accuracy : ', round(accuracy_score(y_test, pred_test) *100, 2) , '%')
-    
-report_acc(df_test, clf)
+
+    acc = round(accuracy_score(y_test, pred_test) *100, 2)
+
+    print('\nHistorical Testing Accuracy : ', acc , '%')
+
+    return acc
+
+acc = report_acc(df_test, clf)
 
 pred = clf.predict(sentence_embedding.reshape(1, -1))
 
@@ -210,23 +221,35 @@ def compute_profit_risk(df, X_):
     total_return = final_return = 10000
     for i in range(len(df)):
         final_return = final_return + df['profit'].iloc[i] * final_return
-    
-    print('Historical return on investment : ', round(final_return / total_return * 100, 2), '%')
-    print('Historical investment risk : ', round(df['profit'].std() *100, 2) , '%\n')
-    
-compute_profit_risk(df_test, X_test)
 
+    ret = round((final_return - total_return) / total_return * 100, 2)
+    risk = round(df['profit'].std() *100, 2)
 
+    print('Historical return on investment : ', ret, '%')
+    print('Historical investment risk : ', risk, '%\n')
 
-result = pd.DataFrame()
+    return ret, risk
+
+ret, risk = compute_profit_risk(df_test, X_test)
+
 
 print('Decision : ')
 if pred == True:
     output_result = 'Long ' + stock1 + ' Short ' + stock2
-    
+    print(output_result)
+
 elif pred == False:
     output_result = 'Long ' + stock2 + ' Short ' + stock1
-    
-print(output_result)
-result['result'] = [output_result]
+    print(output_result)
+
+result['decision'] = [output_result]
+
+result['acc'] = [acc]
+result['return'] = [ret]
+result['risk'] = [risk]
+
+result.index = ['report']
+
+result.to_json('report/' + stock1 + stock2 + '.json', orient="records")
+result.to_json('report/' + stock2 + stock1 + '.json', orient="records")
     
