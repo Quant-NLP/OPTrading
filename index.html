@@ -25,6 +25,10 @@
 
 		function report(form) {
 
+		    if (form.stock1.value == form.stock1.value){
+		        alert('Stocks should be different !')
+		    }
+
 			var xhr = new XMLHttpRequest();
 				xhr.open('get','https://raw.githubusercontent.com/Quant-NLP/OPTrading/main/report/' + form.stock1.value + form.stock2.value + '.json',true);
 				xhr.send(null);
