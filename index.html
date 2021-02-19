@@ -1,56 +1,144 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
+<!--
+	Epilogue by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
 <html>
-<head>
-    <title>OPTrading</title>
-</head>
+	<head>
+		<title>OPTrading</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body>
 
-<body>
-<h1 align=center>OPTrading : A Framework for Opinion-based Pairs Trading</h1>
-<hr>
+		<!-- Header -->
+			<header id="header" class="alt">
+				<div class="inner">
+					<h1>OPTrading</h1>
+					<h3>A Framework for Opinion-based Pairs Trading</h3>
+				</div>
+			</header>
 
+		<script>
 
-<h3 align=center>We provide ten stocks (AAPL, GOOG, GE, MMM, JPM, C, BAC, WMT, MCD, ABBV) to be paired.</h3>
+		function report(form) {
 
-<script>
+			var xhr = new XMLHttpRequest();
+				xhr.open('get','https://raw.githubusercontent.com/Quant-NLP/OPTrading/main/report/' + form.stock1.value + form.stock2.value + 'report.json',true);
+				xhr.send(null);
+				xhr.onload = function(){
+					var datastr = JSON.parse(xhr.responseText);
+					var info = document.querySelector('.info');
+					var len  = datastr.length;
+					var str= "";
+					var btn = document.querySelector('.btn');
 
-function report(form) {
-
-    var xhr = new XMLHttpRequest();
-		xhr.open('get','https://raw.githubusercontent.com/Quant-NLP/OPTrading/main/report/' + form.stock1.value + form.stock2.value + 'report.json',true);
-		xhr.send(null);
-		xhr.onload = function(){
-			var datastr = JSON.parse(xhr.responseText);
-			var info = document.querySelector('.info');
-			var len  = datastr.length;
-			var str= "";
-			var btn = document.querySelector('.btn');
-
-			document.getElementById("acc").innerHTML = 'Historical Testing Accuracy : '  + datastr[0].acc + '%';
-            document.getElementById("return").innerHTML = 'Historical return on investment : ' + datastr[0].return + '%' ;
-            document.getElementById("risk").innerHTML = 'Historical investment risk : '  + datastr[0].risk + '%';
-            document.getElementById("decision").innerHTML = 'Decision : ' + datastr[0].decision ;
-		};
-
-    return;
-	document.testform.submit();	// Submit form
-}
-
-
-</script>
-
-<form name=testform align=center>
-<P>Stock 1 <input type="text" name="stock1" value="AAPL">
-<P>Stock 2 <input type="text" name="stock2" value="GOOG">
-
-<P><input type="button" value="Make a strategic decision" onClick="report(this.form)">
-
-    <p id="acc">Historical Testing Accuracy : </p>
-    <p id="return">Historical return on investment : </p>
-    <p id="risk">Historical investment risk : </p>
-    <p id="decision">Decision : </p>
-
-</form>
+					document.getElementById("acc").innerHTML = 'Historical Testing Accuracy : '  + datastr[0].acc + '%';
+					document.getElementById("return").innerHTML = 'Historical return on investment : ' + datastr[0].return + '%' ;
+					document.getElementById("risk").innerHTML = 'Historical investment risk : '  + datastr[0].risk + '%';
+					document.getElementById("decision").innerHTML = 'Decision : ' + datastr[0].decision ;
 
 
-</body>
+				};
+
+			return;
+			document.testform.submit();	// Submit form
+		}
+
+
+		</script>
+
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Banner -->
+					<section id="intro" class="main">
+
+						<form name=testform align=center>
+						<P>Stock 1 <input align=center type="text" name="stock1" value="AAPL">
+						<P>Stock 2 <input align=center type="text" name="stock2" value="GOOG">
+
+						<P><input type="button" value="Make a strategic decision" onClick="report(this.form)">
+
+						<p id="acc">Historical Testing Accuracy : </p>
+						<p id="return">Historical return on investment : </p>
+						<p id="risk">Historical investment risk : </p>
+						<p id="decision">Decision : </p>
+						</form>
+					</section>
+
+
+
+				<!-- Items -->
+					<section class="main items">
+						<article class="item">
+							<header>
+								<a href="#"><img src="images/pic01.jpg" alt="" /></a>
+								<h3>Historical Testing Accuracy</h3>
+							</header>
+							<p id="acc"></p>
+
+						</article>
+						<article class="item">
+							<header>
+								<a href="#"><img src="images/pic02.jpg" alt="" /></a>
+								<h3>Historical return on investment</h3>
+							</header>
+							<p id="return"></p>
+
+						</article>
+						<article class="item">
+							<header>
+								<a href="#"><img src="images/pic03.jpg" alt="" /></a>
+								<h3>Historical investment risk</h3>
+							</header>
+							<p id="risk"></p>
+						</article>
+						<article class="item">
+							<header>
+								<a href="#"><img src="images/pic04.jpg" alt="" /></a>
+								<h3>Decision</h3>
+							</header>
+							<p id="decision"></p>
+						</article>
+					</section>
+
+
+				<!-- CTA -->
+					<section id="cta" class="main special">
+
+
+
+					</section>
+
+				<!-- Main -->
+				<!--
+					<section id="main" class="main">
+						<header>
+							<h2>Lorem ipsum dolor</h2>
+						</header>
+						<p>Fusce malesuada efficitur venenatis. Pellentesque tempor leo sed massa hendrerit hendrerit. In sed feugiat est, eu congue elit. Ut porta magna vel felis sodales vulputate. Donec faucibus dapibus lacus non ornare. Etiam eget neque id metus gravida tristique ac quis erat. Aenean quis aliquet sem. Ut ut elementum sem. Suspendisse eleifend ut est non dapibus. Nulla porta, neque quis pretium sagittis, tortor lacus elementum metus, in imperdiet ante lorem vitae ipsum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam eget neque id metus gravida tristique ac quis erat. Aenean quis aliquet sem. Ut ut elementum sem. Suspendisse eleifend ut est non dapibus. Nulla porta, neque quis pretium sagittis, tortor lacus elementum metus, in imperdiet ante lorem vitae ipsum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+					</section>
+				-->
+
+				<!-- Footer -->
+					<footer id="footer">
+						<ul class="icons">
+
+						</ul>
+						<p class="copyright">&copy; Untitled. Design: <a href="https://templated.co">TEMPLATED</a>. Images: <a href="https://unsplash.com">Unsplash</a>.</p>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
 </html>
