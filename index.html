@@ -26,7 +26,7 @@
 		function report(form) {
 
 			var xhr = new XMLHttpRequest();
-				xhr.open('get','https://raw.githubusercontent.com/Quant-NLP/OPTrading/main/report/' + form.stock1.value + form.stock2.value + 'report.json',true);
+				xhr.open('get','https://raw.githubusercontent.com/Quant-NLP/OPTrading/main/report/' + form.stock1.value + form.stock2.value + '.json',true);
 				xhr.send(null);
 				xhr.onload = function(){
 					var datastr = JSON.parse(xhr.responseText);
