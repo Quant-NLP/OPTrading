@@ -34,10 +34,27 @@ seed_val = 2021
 
 tech = ['GOOG', 'MSFT', 'FB', 'T', 'CHL', 'ORCL', 'TSM', 'VZ', 'INTC', 'CSCO']
 fin = ['BCH', 'BSAC', 'BRK-A', 'JPM', 'WFC', 'BAC', 'V', 'C', 'HSBC', 'MA']
-all_stocks = tech + fin
+all_stocks = ['GOOG', 'MSFT', 'FB', 'T', 'CHL', 'ORCL', 'TSM', 'VZ', 'INTC', 'CSCO', 'BCH', 'BSAC', 'BRK-A', 'JPM', 'WFC', 'BAC', 'V', 'C', 'HSBC', 'MA']
 
-test_stocks = fin
+test_stocks = all_stocks
 
+from pystocktwits import Streamer
+
+twit = Streamer()
+
+# Get User Messages by ID
+raw_json = twit.get_user_msgs("170", since=0, max=1, limit=1)
+#raw_json = twit.get_user_msgs(str(i+j), since=0, max=1, limit=1)
+return_json_file(raw_json, 'result.json')
+
+with open('result.json', "r") as data_file:
+    data = pd.DataFrame(data_file)
+
+def get_stocktwit(stock):
+    raw_json = twit.get_symbol_msgs(symbol_id=stock, since=0, max=0, limit=30, callback=None, filter=None)
+    #return_json_file(raw_json, 'result.json')
+    df = pd.json_normalize(raw_json)['messages'][0]
+    return df
 
 def Gendf_stock(day, stockname):
     newstr = []
@@ -120,14 +137,97 @@ def get_df(stockname):
     
     return df
 
+
+def get_sentence_embedding(df):
+    sentences = []
+
+    for i in range(len(df)):
+        #print(df[i]['body'])
+        sentences.append(df[i]['body'])
+
+    sentence_embeddings = model.encode(sentences)
+    sentence_embedding = sentence_embeddings.mean(axis=0)
+
+    return sentence_embedding
+
+def preprocess(df):
+
+    data = pd.DataFrame()
+    data = pd.concat([pd.DataFrame(df['sentence_embedding_x'].tolist()), pd.DataFrame(df['sentence_embedding_y'].tolist())], axis = 1)
+    data = data.T.reset_index(drop=True)
+    data = data.T
+
+    return data, df['Strength_x'] > df['Strength_y']
+
+def report_acc(df_test, clf):
+
+    pred_test = clf.predict(X_test)
+
+    acc = round(accuracy_score(y_test, pred_test) *100, 2)
+
+    print('\nHistorical Testing Accuracy : ', acc , '%')
+
+    return acc
+
+def compute_profit_risk(df, X_):
+
+    df['y_true'] = df['Strength_x'] > df['Strength_y']
+    y_pred = clf.predict(X_)
+    df['y_pred'] = y_pred
+
+    df['profit'] = 0.0
+
+    for i in range(len(df)):
+        if df['y_pred'].iloc[i] == True:
+            df['profit'].iloc[i] =  df['Strength_x'].iloc[i] - df['Strength_y'].iloc[i]
+        else:
+            df['profit'].iloc[i] = - df['Strength_x'].iloc[i] + df['Strength_y'].iloc[i]
+
+    total_return = final_return = 10000
+    for i in range(len(df)):
+        final_return = final_return + df['profit'].iloc[i] * final_return
+
+    ret = round((final_return - total_return) / total_return * 100, 2)
+    risk = round(df['profit'].std() *100, 2)
+
+    print('Historical return on investment : ', ret, '%')
+    print('Historical investment risk : ', risk, '%\n')
+
+    return ret, risk
+
+def get_sector_type(stock1, stock2):
+    
+    sector_type = ''
+    if stock1 in tech:
+        if stock2 in tech:
+            sector_type = 'tech'
+        elif stock2 in fin:
+            sector_type = 'techfin'
+    elif stock1 in fin:
+        if stock2 in fin:
+            sector_type = 'fin'
+        elif stock2 in tech:
+            sector_type = 'techfin'   
+            
+    return sector_type
+
+
 for i in range(len(test_stocks) - 1):
     for j in range(i + 1, len(test_stocks)):
+
+#for i in range(len(tech)):
+#    for j in range(len(fin)):
         
         result = pd.DataFrame()
         
         stock1 = test_stocks[i]
         stock2 = test_stocks[j]
+        #stock1 = tech[i]
+        #stock2 = fin[j]
         print(stock1, stock2)
+        
+        sector_type = get_sector_type(stock1, stock2)
+        print(sector_type)
 
         df_stock1 = get_df(stock1)
         df_stock2 = get_df(stock2)
@@ -141,117 +241,40 @@ for i in range(len(test_stocks) - 1):
         df_dev = df[int(len_df * 0.8):int(len_df * 0.9)]
         df_test = df[int(len_df * 0.9):]
         
-        from pystocktwits import Streamer
-
-        twit = Streamer()
-
-        # Get User Messages by ID
-        #raw_json = twit.get_user_msgs("169", since=0, max=1, limit=1)
-        raw_json = twit.get_user_msgs(str(i+j), since=0, max=1, limit=1)
-
-        return_json_file(raw_json, 'result.json')
-        
-        with open('result.json', "r") as data_file:
-            data = pd.DataFrame(data_file)
-            
-        def get_stocktwit(stock):
-            raw_json = twit.get_symbol_msgs(symbol_id=stock, since=0, max=0, limit=30, callback=None, filter=None)
-            #return_json_file(raw_json, 'result.json')
-            df = pd.json_normalize(raw_json)['messages'][0]
-            return df
-        
-        df_stock1 = get_stocktwit(stock1)
-        df_stock2 = get_stocktwit(stock2)
-    
-        def get_sentence_embedding(df):
-            sentences = []
-
-            for i in range(len(df)):
-                #print(df[i]['body'])
-                sentences.append(df[i]['body'])
-
-            sentence_embeddings = model.encode(sentences)
-            sentence_embedding = sentence_embeddings.mean(axis=0)
-
-            return sentence_embedding
-        
         print('crawling', stock1, 'tweets ...')
-        sentence_embedding1 = get_sentence_embedding(df_stock1)
-
+        df_stock1 = get_stocktwit(stock1)
+        
         print('crawling', stock2, 'tweets ...')
+        df_stock2 = get_stocktwit(stock2)
+        
+        sentence_embedding1 = get_sentence_embedding(df_stock1)
         sentence_embedding2 = get_sentence_embedding(df_stock2)
         
         sentence_embedding = np.append(sentence_embedding1, sentence_embedding2)
-        
-        def preprocess(df):
-    
-            data = pd.DataFrame()
-            data = pd.concat([pd.DataFrame(df['sentence_embedding_x'].tolist()), pd.DataFrame(df['sentence_embedding_y'].tolist())], axis = 1)
-            data = data.T.reset_index(drop=True)
-            data = data.T
-
-            return data, df['Strength_x'] > df['Strength_y']
         
         X_train, y_train = preprocess(df_train)
         X_dev, y_dev = preprocess(df_dev)
         X_test, y_test = preprocess(df_test)
         
-        clf = Perceptron(tol=1e-3, random_state=seed_val)
-        clf.fit(X_train, y_train)
-        
-        def report_acc(df_test, clf):
-
-            pred_test = clf.predict(X_test)
-
-            acc = round(accuracy_score(y_test, pred_test) *100, 2)
-
-            print('\nHistorical Testing Accuracy : ', acc , '%')
-
-            return acc
+        clf = joblib.load('./model/' + sector_type + '.pkl')
         
         acc = report_acc(df_test, clf)
         
         pred = clf.predict(sentence_embedding.reshape(1, -1))
-        
-        def compute_profit_risk(df, X_):
-
-            df['y_true'] = df['Strength_x'] > df['Strength_y']
-            y_pred = clf.predict(X_)
-            df['y_pred'] = y_pred
-
-            df['profit'] = 0.0
-
-            for i in range(len(df)):
-                if df['y_pred'].iloc[i] == True:
-                    df['profit'].iloc[i] =  df['Strength_x'].iloc[i] - df['Strength_y'].iloc[i]
-                else:
-                    df['profit'].iloc[i] = - df['Strength_x'].iloc[i] + df['Strength_y'].iloc[i]
-
-            total_return = final_return = 10000
-            for i in range(len(df)):
-                final_return = final_return + df['profit'].iloc[i] * final_return
-
-            ret = round((final_return - total_return) / total_return * 100, 2)
-            risk = round(df['profit'].std() *100, 2)
-
-            print('Historical return on investment : ', ret, '%')
-            print('Historical investment risk : ', risk, '%\n')
-
-            return ret, risk
 
         ret, risk = compute_profit_risk(df_test, X_test)
         
-        
         print('Decision : ')
         if pred == True:
-            output_result = 'Long ' + stock1 + ' Short ' + stock2
-            print(output_result)
+            print('Long ' + stock1 + ' Short ' + stock2) 
+            result['long'] = [stock1]
+            result['short'] = [stock2]
 
         elif pred == False:
             output_result = 'Long ' + stock2 + ' Short ' + stock1
-            print(output_result)
-
-        result['decision'] = [output_result]
+            print('Long ' + stock2 + ' Short ' + stock1) 
+            result['long'] = [stock2]
+            result['short'] = [stock1]
         
         result['acc'] = [acc]
         result['return'] = [ret]
@@ -262,4 +285,5 @@ for i in range(len(test_stocks) - 1):
         result.to_json('report/' + stock1 + stock2 + '.json', orient="records")
         result.to_json('report/' + stock2 + stock1 + '.json', orient="records")
         
+        print('\n')
         
