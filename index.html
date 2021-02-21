@@ -119,7 +119,7 @@
 					document.getElementById("acc").innerHTML = 'Historical Testing Accuracy : '  + datastr[0].acc + '%';
 					document.getElementById("return").innerHTML = 'Historical return on investment : ' + datastr[0].return + '%' ;
 					document.getElementById("risk").innerHTML = 'Historical investment risk : '  + datastr[0].risk + '%';
-					document.getElementById("decision").innerHTML = 'Decision : ' + datastr[0].decision ;
+					document.getElementById("decision").innerHTML = 'Decision : Long ' + datastr[0].long + ' Short ' + datastr[0].short;
 
 
 				};
@@ -139,7 +139,7 @@
 					<section id="intro" class="main">
 
 						<form name=testform align=center>
-                            <P><font size="5"><I><b>Primary Stock</b></I></font>  <input align=center type="text" name="stock1" value="MSFT">
+                            <P><font size="5"><I><b>Primary Stock</b></I></font>  <input align=center type="text" name="stock1" value="T">
 						<P><font size="5"><I><b>Paired Stock</b></I></font> <input align=center type="text" name="stock2" value="GOOG">
 
 						<P><input type="button" value="Make a strategic decision" onClick="report(this.form)">
