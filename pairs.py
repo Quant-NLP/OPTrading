@@ -43,7 +43,7 @@ from pystocktwits import Streamer
 twit = Streamer()
 
 # Get User Messages by ID
-raw_json = twit.get_user_msgs("170", since=0, max=1, limit=1)
+raw_json = twit.get_user_msgs("180", since=0, max=1, limit=1)
 
 return_json_file(raw_json, 'result.json')
 
@@ -130,7 +130,26 @@ def get_df(stockname):
     
     return df
  
+def get_sector_type(stock1, stock2):
+    
+    sector_type = ''
+    if stock1 in tech:
+        if stock2 in tech:
+            sector_type = 'tech'
+        elif stock2 in fin:
+            sector_type = 'techfin'
+    elif stock1 in fin:
+        if stock2 in fin:
+            sector_type = 'fin'
+        elif stock2 in tech:
+            sector_type = 'techfin'   
+            
+    return sector_type
+    
+    
 result = pd.DataFrame()
+
+sector_type = get_sector_type(stock1, stock2)
     
 df_stock1 = get_df(stock1)
 df_stock2 = get_df(stock2)
@@ -151,7 +170,9 @@ def get_stocktwit(stock):
     df = pd.json_normalize(raw_json)['messages'][0]
     return df
 
+print('crawling', stock1, 'tweets ...')
 df_stock1 = get_stocktwit(stock1)
+print('crawling', stock2, 'tweets ...')
 df_stock2 = get_stocktwit(stock2)
 
 def get_sentence_embedding(df):
@@ -166,10 +187,7 @@ def get_sentence_embedding(df):
 
     return sentence_embedding
 
-print('crawling', stock1, 'tweets ...')
 sentence_embedding1 = get_sentence_embedding(df_stock1)
-
-print('crawling', stock2, 'tweets ...')
 sentence_embedding2 = get_sentence_embedding(df_stock2)
 
 sentence_embedding = np.append(sentence_embedding1, sentence_embedding2)
@@ -187,8 +205,7 @@ X_train, y_train = preprocess(df_train)
 X_dev, y_dev = preprocess(df_dev)
 X_test, y_test = preprocess(df_test)
 
-clf = Perceptron(tol=1e-3, random_state=seed_val)
-clf.fit(X_train, y_train)
+clf = joblib.load('./model/' + sector_type + '.pkl')
 
 def report_acc(df_test, clf):
 
@@ -232,17 +249,17 @@ def compute_profit_risk(df, X_):
 
 ret, risk = compute_profit_risk(df_test, X_test)
 
-
 print('Decision : ')
 if pred == True:
-    output_result = 'Long ' + stock1 + ' Short ' + stock2
-    print(output_result)
+    print('Long ' + stock1 + ' Short ' + stock2) 
+    result['long'] = [stock1]
+    result['short'] = [stock2]
 
 elif pred == False:
     output_result = 'Long ' + stock2 + ' Short ' + stock1
-    print(output_result)
-
-result['decision'] = [output_result]
+    print('Long ' + stock2 + ' Short ' + stock1) 
+    result['long'] = [stock2]
+    result['short'] = [stock1]
 
 result['acc'] = [acc]
 result['return'] = [ret]
