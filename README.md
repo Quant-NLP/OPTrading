@@ -21,19 +21,19 @@ In our experiment, we use the partial [StockNet](https://github.com/yumoxu/stock
 ```
 bash scripts/run.sh stock1 stock2
 
-# e.g. bash scripts/run.sh AAPL GOOG
+# e.g. bash scripts/run.sh GOOG T
 ```
 
 ### Example Output
 
 ```
-crawling AAPL tweets ...
 crawling GOOG tweets ...
+crawling T tweets ...
 
-Historical Testing Accuracy :  60.78 %
-Historical return on investment :  7.9 %
-Historical investment risk :  1.48 %
+Historical Testing Accuracy :  64.71 %
+Historical return on investment :  12.91 %
+Historical investment risk :  0.92 %
 
 Decision :
-Long GOOG Short AAPL
+Long T Short GOOG
 ```
