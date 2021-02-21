@@ -34,7 +34,7 @@ seed_val = 2021
 
 tech = ['GOOG', 'MSFT', 'FB', 'T', 'CHL', 'ORCL', 'TSM', 'VZ', 'INTC', 'CSCO']
 fin = ['BCH', 'BSAC', 'BRK-A', 'JPM', 'WFC', 'BAC', 'V', 'C', 'HSBC', 'MA']
-all_stocks = ['GOOG', 'MSFT', 'FB', 'T', 'CHL', 'ORCL', 'TSM', 'VZ', 'INTC', 'CSCO', 'BCH', 'BSAC', 'BRK-A', 'JPM', 'WFC', 'BAC', 'V', 'C', 'HSBC', 'MA']
+all_stocks = tech + fin
 
 test_stocks = all_stocks
 
@@ -43,7 +43,7 @@ from pystocktwits import Streamer
 twit = Streamer()
 
 # Get User Messages by ID
-raw_json = twit.get_user_msgs("170", since=0, max=1, limit=1)
+raw_json = twit.get_user_msgs("172", since=0, max=1, limit=1)
 #raw_json = twit.get_user_msgs(str(i+j), since=0, max=1, limit=1)
 return_json_file(raw_json, 'result.json')
 
@@ -198,18 +198,25 @@ def compute_profit_risk(df, X_):
 def get_sector_type(stock1, stock2):
     
     sector_type = ''
+    
     if stock1 in tech:
         if stock2 in tech:
             sector_type = 'tech'
+            if tech.index(stock1) > tech.index(stock2):
+                stock1, stock2 = stock2, stock1
         elif stock2 in fin:
             sector_type = 'techfin'
+            
     elif stock1 in fin:
         if stock2 in fin:
             sector_type = 'fin'
+            if fin.index(stock1) > fin.index(stock2):
+                stock1, stock2 = stock2, stock1
         elif stock2 in tech:
-            sector_type = 'techfin'   
+            sector_type = 'techfin'
+            stock1, stock2 = stock2, stock1
             
-    return sector_type
+    return stock1, stock2, sector_type
 
 
 for i in range(len(test_stocks) - 1):
@@ -226,8 +233,8 @@ for i in range(len(test_stocks) - 1):
         #stock2 = fin[j]
         print(stock1, stock2)
         
-        sector_type = get_sector_type(stock1, stock2)
-        print(sector_type)
+        stock1, stock2, sector_type = get_sector_type(stock1, stock2)
+        #print(sector_type)
 
         df_stock1 = get_df(stock1)
         df_stock2 = get_df(stock2)

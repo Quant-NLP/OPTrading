@@ -6,6 +6,7 @@ import time
 from datetime import datetime,timedelta
 from sklearn import preprocessing
 from sklearn.linear_model import Perceptron
+import sys
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -16,7 +17,6 @@ model = SentenceTransformer('paraphrase-distilroberta-base-v1')
 import joblib
 import json
 from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
-import sys
 
 tweetpath = './dataset/tweet/preprocessed/'
 pricepath = './dataset/price/raw/'
@@ -29,27 +29,38 @@ PriceList.sort()
 
 window_days = 1
 
+outputpath = '/nfs/nas-7.1/twhsu/PairTrading/data/'
+
 seed_val = 2021
 
 tech = ['GOOG', 'MSFT', 'FB', 'T', 'CHL', 'ORCL', 'TSM', 'VZ', 'INTC', 'CSCO']
 fin = ['BCH', 'BSAC', 'BRK-A', 'JPM', 'WFC', 'BAC', 'V', 'C', 'HSBC', 'MA']
-all_stocks = tech + fin
 
 stock1 = sys.argv[1]
 stock2 = sys.argv[2]
 
+if stock1 == stock2:
+    print('Stocks should be different !')
+    sys.exit()
+    
 from pystocktwits import Streamer
 
 twit = Streamer()
 
 # Get User Messages by ID
-raw_json = twit.get_user_msgs("180", since=0, max=1, limit=1)
-
+raw_json = twit.get_user_msgs("171", since=0, max=1, limit=1)
+#raw_json = twit.get_user_msgs(str(i+j), since=0, max=1, limit=1)
 return_json_file(raw_json, 'result.json')
 
 with open('result.json', "r") as data_file:
     data = pd.DataFrame(data_file)
-    
+
+def get_stocktwit(stock):
+    raw_json = twit.get_symbol_msgs(symbol_id=stock, since=0, max=0, limit=30, callback=None, filter=None)
+    #return_json_file(raw_json, 'result.json')
+    df = pd.json_normalize(raw_json)['messages'][0]
+    return df
+
 def Gendf_stock(day, stockname):
     newstr = []
     
@@ -66,7 +77,8 @@ def Gendf_stock(day, stockname):
             break    
                 
     return [newstr]
-
+ 
+    
 def get_df(stockname):
     
     price = pd.read_csv(pricepath + stockname + '.csv')
@@ -129,51 +141,7 @@ def get_df(stockname):
     df = df[['Date', 'Strength', 'sentence_embedding']]
     
     return df
- 
-def get_sector_type(stock1, stock2):
-    
-    sector_type = ''
-    if stock1 in tech:
-        if stock2 in tech:
-            sector_type = 'tech'
-        elif stock2 in fin:
-            sector_type = 'techfin'
-    elif stock1 in fin:
-        if stock2 in fin:
-            sector_type = 'fin'
-        elif stock2 in tech:
-            sector_type = 'techfin'   
-            
-    return sector_type
-    
-    
-result = pd.DataFrame()
 
-sector_type = get_sector_type(stock1, stock2)
-    
-df_stock1 = get_df(stock1)
-df_stock2 = get_df(stock2)
-
-df = pd.merge(df_stock1, df_stock2, on = 'Date', how = 'left')
-df = df.dropna()
-
-len_df = len(df)
-
-df_train = df[:int(len_df * 0.8)]
-df_dev = df[int(len_df * 0.8):int(len_df * 0.9)]
-df_test = df[int(len_df * 0.9):]
-
-
-def get_stocktwit(stock):
-    raw_json = twit.get_symbol_msgs(symbol_id=stock, since=0, max=0, limit=30, callback=None, filter=None)
-    #return_json_file(raw_json, 'result.json')
-    df = pd.json_normalize(raw_json)['messages'][0]
-    return df
-
-print('crawling', stock1, 'tweets ...')
-df_stock1 = get_stocktwit(stock1)
-print('crawling', stock2, 'tweets ...')
-df_stock2 = get_stocktwit(stock2)
 
 def get_sentence_embedding(df):
     sentences = []
@@ -187,11 +155,6 @@ def get_sentence_embedding(df):
 
     return sentence_embedding
 
-sentence_embedding1 = get_sentence_embedding(df_stock1)
-sentence_embedding2 = get_sentence_embedding(df_stock2)
-
-sentence_embedding = np.append(sentence_embedding1, sentence_embedding2)
-
 def preprocess(df):
 
     data = pd.DataFrame()
@@ -200,12 +163,6 @@ def preprocess(df):
     data = data.T
 
     return data, df['Strength_x'] > df['Strength_y']
-
-X_train, y_train = preprocess(df_train)
-X_dev, y_dev = preprocess(df_dev)
-X_test, y_test = preprocess(df_test)
-
-clf = joblib.load('./model/' + sector_type + '.pkl')
 
 def report_acc(df_test, clf):
 
@@ -216,10 +173,6 @@ def report_acc(df_test, clf):
     print('\nHistorical Testing Accuracy : ', acc , '%')
 
     return acc
-
-acc = report_acc(df_test, clf)
-
-pred = clf.predict(sentence_embedding.reshape(1, -1))
 
 def compute_profit_risk(df, X_):
 
@@ -247,6 +200,67 @@ def compute_profit_risk(df, X_):
 
     return ret, risk
 
+def get_sector_type(stock1, stock2):
+    
+    sector_type = ''
+    
+    if stock1 in tech:
+        if stock2 in tech:
+            sector_type = 'tech'
+            if tech.index(stock1) > tech.index(stock2):
+                stock1, stock2 = stock2, stock1
+        elif stock2 in fin:
+            sector_type = 'techfin'
+            
+    elif stock1 in fin:
+        if stock2 in fin:
+            sector_type = 'fin'
+            if fin.index(stock1) > fin.index(stock2):
+                stock1, stock2 = stock2, stock1
+        elif stock2 in tech:
+            sector_type = 'techfin'
+            stock1, stock2 = stock2, stock1
+            
+    return stock1, stock2, sector_type
+
+        
+result = pd.DataFrame()
+
+stock1, stock2, sector_type = get_sector_type(stock1, stock2)
+
+df_stock1 = get_df(stock1)
+df_stock2 = get_df(stock2)
+
+df = pd.merge(df_stock1, df_stock2, on = 'Date', how = 'left')
+df = df.dropna()
+
+len_df = len(df)
+
+df_train = df[:int(len_df * 0.8)]
+df_dev = df[int(len_df * 0.8):int(len_df * 0.9)]
+df_test = df[int(len_df * 0.9):]
+
+print('crawling', stock1, 'tweets ...')
+df_stock1 = get_stocktwit(stock1)
+
+print('crawling', stock2, 'tweets ...')
+df_stock2 = get_stocktwit(stock2)
+
+sentence_embedding1 = get_sentence_embedding(df_stock1)
+sentence_embedding2 = get_sentence_embedding(df_stock2)
+
+sentence_embedding = np.append(sentence_embedding1, sentence_embedding2)
+
+X_train, y_train = preprocess(df_train)
+X_dev, y_dev = preprocess(df_dev)
+X_test, y_test = preprocess(df_test)
+
+clf = joblib.load('./model/' + sector_type + '.pkl')
+
+acc = report_acc(df_test, clf)
+
+pred = clf.predict(sentence_embedding.reshape(1, -1))
+
 ret, risk = compute_profit_risk(df_test, X_test)
 
 print('Decision : ')
@@ -267,6 +281,8 @@ result['risk'] = [risk]
 
 result.index = ['report']
 
-result.to_json('report/' + stock1 + stock2 + '.json', orient="records")
-result.to_json('report/' + stock2 + stock1 + '.json', orient="records")
-    
+#result.to_json('report/' + stock1 + stock2 + '.json', orient="records")
+#result.to_json('report/' + stock2 + stock1 + '.json', orient="records")
+
+print('\n')
+        
