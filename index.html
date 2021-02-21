@@ -31,8 +31,21 @@
         <!-- Wrapper -->
 			<div id="wrapper">
 
+
+
 				<!-- Banner -->
 					<section id="intro" class="main">
+
+						<h1>Ranking</h1>
+						<form align=center>
+							<select id="rank" name="rank" size="10">
+							<option value="acc">Accuracy</option>
+							<option value="return">Return</option>
+							<option value="risk">Risk</option>
+							</select><br>
+							<input type="button" value="Ranking" onClick="ranking(this.form)">
+						</form>
+
                         <h2>Top-5 Pairs</h2>
                         <style type="text/css">
                         .tg  {border-collapse:collapse;border-spacing:0;}
@@ -59,11 +72,11 @@
                             <td class="tg-baqh">Risk</td>
                           </tr>
                           <tr>
-                            <td class="tg-baqh">FB</td>
-                            <td class="tg-baqh">TSM</td>
-                            <td class="tg-baqh">68.63%</td>
-                            <td class="tg-baqh">23.15%</td>
-                            <td class="tg-baqh">1.36%</td>
+                            <td class="tg-baqh"><p style="white-space:nowrap" id="top1_long"></p></td>
+                            <td class="tg-baqh"><p style="white-space:nowrap" id="top1_short"></p></td>
+                            <td class="tg-baqh"><p style="white-space:nowrap" id="top1_acc"></p></td>
+                            <td class="tg-baqh"><p style="white-space:nowrap" id="top1_return"></p></td>
+                            <td class="tg-baqh"><p style="white-space:nowrap" id="top1_risk"></p></td>
                           </tr>
                           <tr>
                             <td class="tg-baqh">ORCL</td>
@@ -99,6 +112,31 @@
 
 
 		<script>
+
+		function ranking(form) {
+
+			var xhr = new XMLHttpRequest();
+				xhr.open('get','https://raw.githubusercontent.com/Quant-NLP/OPTrading/main/report/sort/' + form.rank.value + '.json',true);
+				xhr.send(null);
+				xhr.onload = function(){
+					var datastr = JSON.parse(xhr.responseText);
+					var info = document.querySelector('.info');
+					var len  = datastr.length;
+					var str= "";
+					var btn = document.querySelector('.btn');
+
+					document.getElementById("top1_long").innerHTML =  datastr[0].long;
+					document.getElementById("top1_short").innerHTML =  datastr[0].short;
+					document.getElementById("top1_acc").innerHTML =  datastr[0].acc + '%';
+					document.getElementById("top1_return").innerHTML =  datastr[0].return + '%';
+					document.getElementById("top1_risk").innerHTML =  datastr[0].risk + '%';
+
+
+				};
+
+			return;
+			document.testform.submit();	// Submit form
+		}
 
 		function report(form) {
 
