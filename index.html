@@ -46,7 +46,7 @@
 							<input type="button" value="Ranking" onClick="ranking(this.form)">
 						</form>
 
-                        <h2>Top-5 Pairs</h2>
+                        <h3>Top-5 Pairs</h3>
                         <style type="text/css">
                         .tg  {border-collapse:collapse;border-spacing:0;}
                         .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Comic Sans MS, sans-serif;font-size:15px;
@@ -79,35 +79,84 @@
                             <td class="tg-baqh" id="top1_risk"></td>
                           </tr>
                           <tr>
-                            <td class="tg-baqh">ORCL</td>
-                            <td class="tg-baqh">CHL</td>
-                            <td class="tg-baqh">66.67%</td>
-                            <td class="tg-baqh">11.61%</td>
-                            <td class="tg-baqh">0.91%</td>
+                            <td class="tg-baqh" id="top2_long"></td>
+                            <td class="tg-baqh" id="top2_short"></td>
+                            <td class="tg-baqh" id="top2_acc"></td>
+                            <td class="tg-baqh" id="top2_return"></td>
+                            <td class="tg-baqh" id="top2_risk"></td>
                           </tr>
                           <tr>
-                            <td class="tg-baqh">CHL</td>
-                            <td class="tg-baqh">T</td>
-                            <td class="tg-baqh">66.67%</td>
-                            <td class="tg-baqh">8.43%</td>
-                            <td class="tg-baqh">0.80%</td>
+                            <td class="tg-baqh" id="top3_long"></td>
+                            <td class="tg-baqh" id="top3_short"></td>
+                            <td class="tg-baqh" id="top3_acc"></td>
+                            <td class="tg-baqh" id="top3_return"></td>
+                            <td class="tg-baqh" id="top3_risk"></td>
                           </tr>
                           <tr>
-                            <td class="tg-baqh">T</td>
-                            <td class="tg-baqh">BRK-A</td>
-                            <td class="tg-baqh">66.67%</td>
-                            <td class="tg-baqh">5.13%</td>
-                            <td class="tg-baqh">0.84%</td>
+                            <td class="tg-baqh" id="top4_long"></td>
+                            <td class="tg-baqh" id="top4_short"></td>
+                            <td class="tg-baqh" id="top4_acc"></td>
+                            <td class="tg-baqh" id="top4_return"></td>
+                            <td class="tg-baqh" id="top4_risk"></td>
                           </tr>
                           <tr>
-                            <td class="tg-baqh">GOOG</td>
-                            <td class="tg-baqh">T</td>
-                            <td class="tg-baqh">64.71%</td>
-                            <td class="tg-baqh">9.90%</td>
-                            <td class="tg-baqh">0.93%</td>
+                            <td class="tg-baqh" id="top5_long"></td>
+                            <td class="tg-baqh" id="top5_short"></td>
+                            <td class="tg-baqh" id="top5_acc"></td>
+                            <td class="tg-baqh" id="top5_return"></td>
+                            <td class="tg-baqh" id="top5_risk"></td>
                           </tr>
                         </tbody>
                         </table>
+
+						<br> <br> <br>
+
+						<h1>Optional Pairs</h1>
+
+						<form name=testform align=center>
+                            <P><font size="5"><I><b>Primary Stock</b></I></font>  <input align=center type="text" name="stock1" value="T">
+						<P><font size="5"><I><b>Paired Stock</b></I></font> <input align=center type="text" name="stock2" value="GOOG">
+
+						<P><input type="button" value="Make a strategic decision" onClick="report(this.form)">
+
+						<style type="text/css">
+                        .tg  {border-collapse:collapse;border-spacing:0;}
+                        .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Comic Sans MS, sans-serif;font-size:15px;
+                          overflow:hidden;padding:10px 5px;word-break:normal;}
+                        .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Comic Sans MS, sans-serif;font-size:15px;
+                          font-weight:normal;overflow:hidden;padding:8px 5px;word-break:normal;}
+                        .tg .tg-baqh{text-align:center;vertical-align:top}
+                        .tg .tg-0lax{text-align:left;vertical-align:top}
+                        </style>
+                        <table class="tg">
+                        <thead>
+                          <tr>
+                            <th class="tg-baqh" colspan="2"><font size="4"><I><b>Target Pair</b></I></font></th>
+                            <th class="tg-baqh" colspan="3"><font size="4"><I><b>Backtesting</b></I></font></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td class="tg-baqh">Long</td>
+                            <td class="tg-baqh">Short</td>
+                            <td class="tg-baqh">Acc.</td>
+                            <td class="tg-baqh">Return</td>
+                            <td class="tg-baqh">Risk</td>
+                          </tr>
+                          <tr>
+                            <td class="tg-baqh" id="long"></td>
+                            <td class="tg-baqh" id="short"></td>
+                            <td class="tg-baqh" id="acc"></td>
+                            <td class="tg-baqh" id="return"></td>
+                            <td class="tg-baqh" id="risk"></td>
+                          </tr>
+
+                        </tbody>
+                        </table>
+
+						</form>
+
+
 					</section>
 
 
@@ -130,6 +179,30 @@
 					document.getElementById("top1_acc").innerHTML =  datastr[0].acc + '%';
 					document.getElementById("top1_return").innerHTML =  datastr[0].return + '%';
 					document.getElementById("top1_risk").innerHTML =  datastr[0].risk + '%';
+
+					document.getElementById("top2_long").innerHTML =  datastr[1].long;
+					document.getElementById("top2_short").innerHTML =  datastr[1].short;
+					document.getElementById("top2_acc").innerHTML =  datastr[1].acc + '%';
+					document.getElementById("top2_return").innerHTML =  datastr[1].return + '%';
+					document.getElementById("top2_risk").innerHTML =  datastr[1].risk + '%';
+
+					document.getElementById("top3_long").innerHTML =  datastr[2].long;
+					document.getElementById("top3_short").innerHTML =  datastr[2].short;
+					document.getElementById("top3_acc").innerHTML =  datastr[2].acc + '%';
+					document.getElementById("top3_return").innerHTML =  datastr[2].return + '%';
+					document.getElementById("top3_risk").innerHTML =  datastr[2].risk + '%';
+
+					document.getElementById("top4_long").innerHTML =  datastr[3].long;
+					document.getElementById("top4_short").innerHTML =  datastr[3].short;
+					document.getElementById("top4_acc").innerHTML =  datastr[3].acc + '%';
+					document.getElementById("top4_return").innerHTML =  datastr[3].return + '%';
+					document.getElementById("top4_risk").innerHTML =  datastr[3].risk + '%';
+
+					document.getElementById("top5_long").innerHTML =  datastr[4].long;
+					document.getElementById("top5_short").innerHTML =  datastr[4].short;
+					document.getElementById("top5_acc").innerHTML =  datastr[4].acc + '%';
+					document.getElementById("top5_return").innerHTML =  datastr[4].return + '%';
+					document.getElementById("top5_risk").innerHTML =  datastr[4].risk + '%';
 
 
 				};
@@ -154,12 +227,11 @@
 					var str= "";
 					var btn = document.querySelector('.btn');
 
-					document.getElementById("acc").innerHTML = 'Historical Testing Accuracy : '  + datastr[0].acc + '%';
-					document.getElementById("return").innerHTML = 'Historical return on investment : ' + datastr[0].return + '%' ;
-					document.getElementById("risk").innerHTML = 'Historical investment risk : '  + datastr[0].risk + '%';
-					document.getElementById("decision").innerHTML = 'Decision : Long ' + datastr[0].long + ' Short ' + datastr[0].short;
-
-
+					document.getElementById("long").innerHTML =  datastr[0].long;
+					document.getElementById("short").innerHTML =  datastr[0].short;
+					document.getElementById("acc").innerHTML =  datastr[0].acc + '%';
+					document.getElementById("return").innerHTML =  datastr[0].return + '%';
+					document.getElementById("risk").innerHTML =  datastr[0].risk + '%';
 				};
 
 			return;
@@ -176,18 +248,7 @@
 				<!-- Banner -->
 					<section id="intro" class="main">
 
-						<form name=testform align=center>
-                            <P><font size="5"><I><b>Primary Stock</b></I></font>  <input align=center type="text" name="stock1" value="T">
-						<P><font size="5"><I><b>Paired Stock</b></I></font> <input align=center type="text" name="stock2" value="GOOG">
 
-						<P><input type="button" value="Make a strategic decision" onClick="report(this.form)">
-
-
-						<h4 id="acc">Historical Testing Accuracy :</h4>
-						<h4 id="return">Historical return on investment : </h4>
-						<h4 id="risk">Historical investment risk : </h4>
-						<h4 id="decision">Decision : </h4>
-						</form>
 					</section>
 
 
