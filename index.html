@@ -37,14 +37,16 @@
 					<section id="intro" class="main">
 
 						<h1>Ranking</h1>
-						<form align=center>
-							<select id="rank" name="rank" size="10">
+
+
+						<select align=center onClick="ranking(this)" >
+
 							<option value="acc">Accuracy</option>
 							<option value="return">Return</option>
 							<option value="risk">Risk</option>
-							</select><br>
-							<input type="button" value="Ranking" onClick="ranking(this.form)">
-						</form>
+						</select> <br>
+
+
 
                         <h3>Top-5 Pairs</h3>
                         <style type="text/css">
@@ -162,10 +164,11 @@
 
 		<script>
 
-		function ranking(form) {
+		function ranking(value) {
+			var selectedOption=value.options[value.selectedIndex];
 
 			var xhr = new XMLHttpRequest();
-				xhr.open('get','https://raw.githubusercontent.com/Quant-NLP/OPTrading/main/report/sort/' + form.rank.value + '.json',true);
+				xhr.open('get','https://raw.githubusercontent.com/Quant-NLP/OPTrading/main/report/sort/' + selectedOption.value + '.json',true);
 				xhr.send(null);
 				xhr.onload = function(){
 					var datastr = JSON.parse(xhr.responseText);
